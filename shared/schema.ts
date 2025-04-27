@@ -36,6 +36,9 @@ export const quotes = pgTable('quotes', {
   amount: text('amount').notNull(),
   status: text('status').notNull().default('draft'),
   zohoQuoteId: text('zoho_quote_id'),
+  quoteNumber: text('quote_number'),
+  sentAt: timestamp('sent_at'),
+  followupCount: integer('followup_count').default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

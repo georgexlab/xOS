@@ -27,6 +27,14 @@ args = "Quote Wizard Dev"
 task = "workflow.run"
 args = "Quote Wizard Test"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Suzie Orchestrator Dev"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Suzie Orchestrator Test"
+
 [[workflows.workflow]]
 name = "Lint"
 author = "agent"
@@ -59,6 +67,22 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd services/quote-wizard && npx jest"
+
+[[workflows.workflow]]
+name = "Suzie Orchestrator Dev"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/suzie-orchestrator && npx ts-node src/index.ts"
+
+[[workflows.workflow]]
+name = "Suzie Orchestrator Test"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/suzie-orchestrator && npx jest --forceExit"
 
 [deployment]
 run = ["sh", "-c", "cd services/events-gateway && npx ts-node --transpile-only src/index.ts"]

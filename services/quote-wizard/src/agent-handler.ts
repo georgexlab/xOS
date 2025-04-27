@@ -89,25 +89,26 @@ export async function processAgentActions(): Promise<void> {
   try {
     console.log('Processing agent actions...');
     
-    // Use direct SQL via client to get agents with quote_generation skill
+    // Use direct SQL via client to get agents with either quote_generation or follow_up_emails skills
     // Since the Drizzle db instance doesn't have a query method
     const client = db.$client;
     const agentQuery = `
       SELECT * FROM agents 
       WHERE skills @> '["quote_generation"]'::jsonb
+         OR skills @> '["follow_up_emails"]'::jsonb
     `;
     
-    const { rows: quoteAgents } = await client.query(agentQuery);
+    const { rows: activeAgents } = await client.query(agentQuery);
     
-    if (quoteAgents.length === 0) {
-      console.log('No quote-generation agents found');
+    if (activeAgents.length === 0) {
+      console.log('No active agents found for quote generation or follow-up');
       return;
     }
     
-    console.log(`Found ${quoteAgents.length} quote-generation agents`);
+    console.log(`Found ${activeAgents.length} active agents`);
     
     // Process actions for each agent
-    for (const agent of quoteAgents) {
+    for (const agent of activeAgents) {
       const pendingActions = await workforce.getPendingActionsByAgent(agent.id);
       
       console.log(`Processing ${pendingActions.length} pending actions for ${agent.code_name}`);
@@ -117,7 +118,7 @@ export async function processAgentActions(): Promise<void> {
         
         if (action.type === 'generate_quote') {
           await handleGenerateQuoteAction(action);
-        } else if (action.type === 'send_quote_followup') {
+        } else if (action.type === 'send_quote_followup' || action.type === 'send_quote_secondary_followup') {
           await handleSendQuoteFollowupAction(action);
         } else {
           console.log(`Unknown action type: ${action.type}, skipping`);
@@ -219,18 +220,24 @@ async function handleGenerateQuoteAction(action: any): Promise<void> {
  */
 async function handleSendQuoteFollowupAction(action: any): Promise<void> {
   try {
-    console.log(`Handling send_quote_followup action ${action.id}`);
+    console.log(`Handling ${action.type} action ${action.id}`);
     
-    const { quoteId, emailContent } = action.payload;
+    const { quoteId, message } = action.payload;
+    const isSecondary = action.type === 'send_quote_secondary_followup';
     
-    if (!quoteId || !emailContent) {
-      console.error('Missing required fields in send_quote_followup payload');
+    if (!quoteId) {
+      console.error('Missing required quoteId in followup payload');
       await workforce.failAction(action.id);
       return;
     }
     
+    // Generate email content if not provided
+    const emailContent = message || (isSecondary
+      ? 'This is a secondary follow-up to remind you about the quote we sent previously.'
+      : 'This is a follow-up regarding the quote we sent. Please let us know if you have any questions.');
+    
     // This would integrate with an email service in a real implementation
-    console.log(`Would send followup email for quote ${quoteId}`);
+    console.log(`Would send ${isSecondary ? 'secondary ' : ''}followup email for quote ${quoteId}`);
     console.log(`Email content: ${emailContent}`);
     
     // Mark the action as completed
@@ -239,15 +246,16 @@ async function handleSendQuoteFollowupAction(action: any): Promise<void> {
     // Create an event for the followup
     try {
       await eventsClient.createEvent({
-        type: 'quote_followup_sent',
+        type: isSecondary ? 'quote_secondary_followup_sent' : 'quote_followup_sent',
         payload: {
           quoteId,
           agentId: action.createdBy,
+          isSecondary,
           timestamp: new Date().toISOString()
         }
       });
     } catch (eventError) {
-      console.warn('Failed to create quote_followup_sent event:', eventError);
+      console.warn(`Failed to create ${isSecondary ? 'quote_secondary_followup_sent' : 'quote_followup_sent'} event:`, eventError);
       // Continue even if the event creation fails
     }
     
