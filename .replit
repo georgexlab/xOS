@@ -13,20 +13,19 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
+args = "Lint"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
 args = "xOS Dev Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Lint"
-
-[[workflows.workflow]]
-name = "xOS Dev Server"
-author = "agent"
+args = "Quote Wizard Dev"
 
 [[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/dev.js"
-waitForPort = 5000
+task = "workflow.run"
+args = "Quote Wizard Test"
 
 [[workflows.workflow]]
 name = "Lint"
@@ -36,8 +35,33 @@ author = "agent"
 task = "shell.exec"
 args = "npx eslint . --ext .ts --config eslint.config.js"
 
+[[workflows.workflow]]
+name = "xOS Dev Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/events-gateway && npx ts-node --transpile-only src/index.ts"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Quote Wizard Dev"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/quote-wizard && npx ts-node --transpile-only src/index.ts"
+
+[[workflows.workflow]]
+name = "Quote Wizard Test"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/quote-wizard && npx jest"
+
 [deployment]
-run = ["sh", "-c", "node scripts/dev.js"]
+run = ["sh", "-c", "cd services/events-gateway && npx ts-node --transpile-only src/index.ts"]
 
 [[ports]]
 localPort = 4000
