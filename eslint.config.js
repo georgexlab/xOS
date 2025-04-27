@@ -1,3 +1,4 @@
+
 // @ts-check
 const { builtinModules } = require('node:module');
 const { FlatCompat } = require('@eslint/eslintrc');
@@ -20,14 +21,23 @@ module.exports = [
       parser: parser,
       ecmaVersion: 2022,
       sourceType: 'module',
+      globals: {
+        module: 'readonly',
+        require: 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        console: 'readonly',
+      },
     },
-    files: ['**/*.ts'],
-    ignores: ['node_modules/**', 'dist/**', 'build/**', '.eslintrc.js'],
+    files: ['**/*.ts', '**/*.js'],
+    ignores: ['node_modules/**', 'dist/**', 'build/**'],
     rules: {
-      'no-unused-vars': 'off', // TypeScript already checks this
+      'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-require-imports': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn'
     }
   },
 ];
