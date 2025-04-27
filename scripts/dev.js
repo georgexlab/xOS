@@ -87,9 +87,9 @@ function checkDatabase() {
   }
 }
 
-// Skip Prisma client generation since we're using Drizzle ORM
-function generatePrismaClient() {
-  log.info('Skipping Prisma operations (using Drizzle ORM)...');
+// Skip Prisma operations since we're using Drizzle ORM
+function setupDatabase() {
+  log.info('Setting up database with Drizzle ORM...');
   log.success('Using Drizzle ORM for database operations');
 }
 
@@ -116,7 +116,7 @@ async function main() {
   checkDependencies();
   
   if (checkDatabase()) {
-    generatePrismaClient();
+    setupDatabase();
     const gateway = startEventsGateway();
 
     // Handle script termination

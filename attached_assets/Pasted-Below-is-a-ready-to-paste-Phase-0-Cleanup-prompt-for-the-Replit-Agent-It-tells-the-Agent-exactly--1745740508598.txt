@@ -1,0 +1,58 @@
+Below is a ready-to-paste “Phase 0 Cleanup” prompt for the Replit Agent.
+It tells the Agent exactly what to refactor and how you’ll test success—nothing more, nothing less.
+
+### Phase 0 Cleanup — stabilise the scaffold before Phase 1
+
+Your job is to tidy the existing repo so the foundation is lean and deterministic.
+Do **not** add new features or services.
+
+1. 🔥 Remove Prisma
+   • `pnpm remove prisma @prisma/client`
+   • Delete `/infra/schema.prisma`, any prisma‐generated folders, and prisma CLI calls in scripts/dev.js or package.json.
+
+2. 🗄️ Capture current schema as Drizzle migrations
+   • Use the existing `shared/schema.ts`.
+   • Run:  
+       npx drizzle-kit generate:pg --schema=shared/schema.ts  
+       npx drizzle-kit push:pg
+   • Commit the generated migration files in `/drizzle`.
+
+3. ⚙️ Normalise dev scripts
+   • In root **package.json** add:  
+     ```json
+     "scripts": {
+       "dev": "node scripts/dev.js",
+       "lint": "eslint . --ext .ts"
+     }
+     ```
+   • In `scripts/dev.js` delete / comment the Docker-detect block; Replit does not support Docker.  
+     Only start DB check + `services/events-gateway`.
+
+4. 📝 README quick-start (replace current file)
+
+xOS – Phase 0
+
+pnpm install
+pnpm dev            # boots events-gateway on REPLIT_PORT (5000 locally)
+curl $PORT/health   # → { "status": "ok" }
+
+5. 🧭 docs/architecture.md
+• Keep the context section.
+• Add a bullet diagram of current folders and planned future services (quote-wizard, payment-reconcile, dashboard-next).
+
+6. 🧹 House-keeping
+• Ensure `/pnpm-workspace.yaml` includes `shared` and `drizzle` (if generated).  
+• Run `pnpm lint` and fix any new errors.
+
+### ✅ Acceptance criteria
+- `pnpm install && pnpm dev` runs without Prisma warnings or Docker errors.
+- `curl localhost:5000/health` returns `{ "status": "ok" }`.
+- `drizzle-kit status` shows **0** pending migrations.
+- `pnpm lint` exits with code 0.
+- README reflects the new quick-start.
+- Git diff shows removal of Prisma files and addition of Drizzle migrations only.
+
+Commit a single checkpoint when done; do not touch Phase 1 code.
+
+Paste the prompt into the Replit Agent chat, review its plan, then approve.
+When everything in Acceptance criteria passes, tag the repo (e.g., phase-0-ok) and we’ll move on to building quote-wizard. 🚀

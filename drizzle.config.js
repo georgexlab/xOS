@@ -1,8 +1,8 @@
 
 module.exports = {
   schema: './shared/schema.ts',
-  out: './migrations',
-  driver: 'pg',
+  out: './drizzle',
+  dialect: 'postgresql',
   dbCredentials: {
     connectionString: process.env.DATABASE_URL,
   },

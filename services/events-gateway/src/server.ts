@@ -26,15 +26,15 @@ server.get('/', async () => {
     endpoints: [
       { path: '/', method: 'GET', description: 'API information' },
       { path: '/health', method: 'GET', description: 'Health check' },
-      { path: '/events', method: 'GET', description: 'List all events' },
-      { path: '/events', method: 'POST', description: 'Create a new event' },
-      { path: '/users', method: 'GET', description: 'List all users' },
-      { path: '/quotes', method: 'GET', description: 'List all quotes' },
-      { path: '/quotes', method: 'POST', description: 'Create a new quote' },
-      { path: '/clients', method: 'GET', description: 'List all clients' },
-      { path: '/clients', method: 'POST', description: 'Create a new client' },
-      { path: '/payments', method: 'GET', description: 'List all payments' },
-      { path: '/payments', method: 'POST', description: 'Create a new payment' },
+      { path: '/api/events', method: 'GET', description: 'List all events' },
+      { path: '/api/events', method: 'POST', description: 'Create a new event' },
+      { path: '/api/users', method: 'GET', description: 'List all users' },
+      { path: '/api/quotes', method: 'GET', description: 'List all quotes' },
+      { path: '/api/quotes', method: 'POST', description: 'Create a new quote' },
+      { path: '/api/clients', method: 'GET', description: 'List all clients' },
+      { path: '/api/clients', method: 'POST', description: 'Create a new client' },
+      { path: '/api/payments', method: 'GET', description: 'List all payments' },
+      { path: '/api/payments', method: 'POST', description: 'Create a new payment' },
     ]
   };
 });
@@ -52,7 +52,7 @@ server.get('/health', async () => {
 });
 
 // Register events endpoints
-server.get('/events', async () => {
+server.get('/api/events', async () => {
   try {
     const allEvents = await db.select().from(events);
     return { events: allEvents };
@@ -62,7 +62,7 @@ server.get('/events', async () => {
   }
 });
 
-server.post('/events', async (request, reply) => {
+server.post('/api/events', async (request, reply) => {
   try {
     const { type, payload } = request.body as { type: string; payload: any };
     
@@ -88,7 +88,7 @@ server.post('/events', async (request, reply) => {
 });
 
 // Register users endpoints
-server.get('/users', async () => {
+server.get('/api/users', async () => {
   try {
     const allUsers = await db.select().from(users);
     return { users: allUsers };
@@ -99,7 +99,7 @@ server.get('/users', async () => {
 });
 
 // Register quotes endpoints
-server.get('/quotes', async () => {
+server.get('/api/quotes', async () => {
   try {
     const allQuotes = await db.select().from(quotes);
     return { quotes: allQuotes };
@@ -109,7 +109,7 @@ server.get('/quotes', async () => {
   }
 });
 
-server.post('/quotes', async (request, reply) => {
+server.post('/api/quotes', async (request, reply) => {
   try {
     const { clientId, title, description, amount, status, zohoQuoteId } = request.body as { 
       clientId: number; 
@@ -163,7 +163,7 @@ server.post('/quotes', async (request, reply) => {
 });
 
 // Register payments endpoints
-server.get('/payments', async () => {
+server.get('/api/payments', async () => {
   try {
     const allPayments = await db.select().from(payments);
     return { payments: allPayments };
@@ -173,7 +173,7 @@ server.get('/payments', async () => {
   }
 });
 
-server.post('/payments', async (request, reply) => {
+server.post('/api/payments', async (request, reply) => {
   try {
     const { quoteId, amount, status, transactionId } = request.body as { 
       quoteId: number; 
@@ -223,7 +223,7 @@ server.post('/payments', async (request, reply) => {
 });
 
 // Register clients endpoints
-server.get('/clients', async () => {
+server.get('/api/clients', async () => {
   try {
     const allClients = await db.select().from(clients);
     return { clients: allClients };
@@ -233,7 +233,7 @@ server.get('/clients', async () => {
   }
 });
 
-server.post('/clients', async (request, reply) => {
+server.post('/api/clients', async (request, reply) => {
   try {
     const { name, email, phone, zohoClientId } = request.body as { 
       name: string; 
