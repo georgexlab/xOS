@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@xos/shared-prompt": ["packages/shared-prompt/src"],
+      "@xos/vector-brain": ["packages/vector-brain/src"]
+    }
+  },
+  "references": [
+    { "path": "./services/events-gateway" },
+    { "path": "./services/quote-wizard" },
+    { "path": "./services/payment-reconcile" },
+    { "path": "./packages/shared-prompt" },
+    { "path": "./packages/vector-brain" },
+    { "path": "./apps/dashboard-next" }
+  ],
+  "exclude": ["node_modules"]
+}
