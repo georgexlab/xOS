@@ -1,6 +1,7 @@
-# xOS Microservices
 
-A TypeScript monorepo for an advanced event-driven operating system with robust event management and client interaction capabilities.
+# xOS – Phase 0 quick-start
+
+Event-driven microservices system built with TypeScript and Fastify.
 
 ## Quick Start
 
@@ -9,8 +10,8 @@ A TypeScript monorepo for an advanced event-driven operating system with robust 
 pnpm install
 
 # Start development server
-pnpm dev
+pnpm dev             # boots events-gateway on port 5000
 
 # Check health
-curl http://localhost:5000/health
+curl http://0.0.0.0:5000/health    # → { "status": "ok" }
 ```
