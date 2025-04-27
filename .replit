@@ -35,6 +35,10 @@ args = "Suzie Orchestrator Dev"
 task = "workflow.run"
 args = "Suzie Orchestrator Test"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Events Gateway Test"
+
 [[workflows.workflow]]
 name = "Lint"
 author = "agent"
@@ -83,6 +87,14 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd services/suzie-orchestrator && npx jest --forceExit"
+
+[[workflows.workflow]]
+name = "Events Gateway Test"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/events-gateway && npx jest --forceExit"
 
 [deployment]
 run = ["sh", "-c", "cd services/events-gateway && npx ts-node --transpile-only src/index.ts"]
