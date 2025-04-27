@@ -24,7 +24,7 @@ function pushDrizzleSchema() {
   log.info('Pushing Drizzle schema to database...');
   
   try {
-    execSync('npx drizzle-orm push:pg --schema=./shared/schema.ts', {
+    execSync('npx drizzle-kit push:pg', {
       stdio: 'inherit',
       cwd: path.join(__dirname, '..'),
       env: { ...process.env },

@@ -74,6 +74,51 @@ export const payments = pgTable('payments', {
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
 
+// Employees model (real humans)
+export const employees = pgTable('employees', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  fullName: text('full_name'),
+  email: text('email').unique(),
+  profilePhoto: text('profile_photo'), // URL
+  role: text('role'), // 'Account', 'Designer', etc.
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Define Employee type from the schema
+export type Employee = typeof employees.$inferSelect;
+export type InsertEmployee = typeof employees.$inferInsert;
+
+// Agents model (AI agents like SUZIE, quotes-bot, pay-bot)
+export const agents = pgTable('agents', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  codeName: text('code_name').unique(), // e.g. 'SUZIE'
+  description: text('description'), // personality / purpose
+  avatar: text('avatar'), // URL
+  skills: jsonb('skills'), // array of skill strings
+  ownerEmpId: uuid('owner_emp_id').references(() => employees.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Define Agent type from the schema
+export type Agent = typeof agents.$inferSelect;
+export type InsertAgent = typeof agents.$inferInsert;
+
+// Actions model (central task/actions queue)
+export const actions = pgTable('actions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  type: text('type'), // 'quote_followup_email', etc.
+  payload: jsonb('payload'),
+  status: text('status').default('pending'), // pending/approved/rejected/completed/failed
+  createdBy: uuid('created_by').references(() => agents.id),
+  approvedBy: uuid('approved_by').references(() => employees.id),
+  approvedAt: timestamp('approved_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Define Action type from the schema
+export type Action = typeof actions.$inferSelect;
+export type InsertAction = typeof actions.$inferInsert;
+
 // Define relations
 export const quotesRelations = relations(quotes, ({ one }) => ({
   client: one(clients, {
@@ -90,5 +135,27 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
   quote: one(quotes, {
     fields: [payments.quoteId],
     references: [quotes.id],
+  }),
+}));
+
+export const agentsRelations = relations(agents, ({ one }) => ({
+  owner: one(employees, {
+    fields: [agents.ownerEmpId],
+    references: [employees.id],
+  }),
+}));
+
+export const employeesRelations = relations(employees, ({ many }) => ({
+  agents: many(agents),
+}));
+
+export const actionsRelations = relations(actions, ({ one }) => ({
+  creator: one(agents, {
+    fields: [actions.createdBy],
+    references: [agents.id],
+  }),
+  approver: one(employees, {
+    fields: [actions.approvedBy],
+    references: [employees.id],
   }),
 }));
