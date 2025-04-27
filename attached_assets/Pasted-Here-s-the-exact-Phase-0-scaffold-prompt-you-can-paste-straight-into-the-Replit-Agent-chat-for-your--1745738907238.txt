@@ -1,0 +1,74 @@
+Here’s the exact Phase 0 scaffold prompt you can paste straight into the Replit Agent chat for your brand-new workspace.
+
+### 📚 Context
+We’re building **xOS** — an event-driven, AI-powered operating system for xLAB.
+
+Architecture to keep in mind (for later phases):
+- **/services/**
+  • events-gateway   → Fastify server that ingests webhooks (Gmail, Zoho, Wio Bank…).  
+  • quote-wizard     → Worker that turns briefs into Zoho quotes/invoices.  
+  • payment-reconcile→ Worker that polls Wio transactions and marks Zoho invoices paid.  
+
+- **/packages/**
+  • shared-prompt    → Prompt templates & utility functions.  
+  • vector-brain     → pgvector helper to store & query embeddings.  
+
+- **/apps/**
+  • dashboard-next   → Next.js + shadcn/ui HUD (Kanban, metrics, notifications).
+
+Tech stack: **pnpm workspaces · TypeScript · Prisma · Postgres (+ pgvector) · Node 20 · Docker**.
+
+---
+
+### 🏗️ Phase 0 – Scaffold monorepo
+
+1. **Folder layout**
+
+/services/events-gateway
+/services/quote-wizard
+/services/payment-reconcile
+/packages/shared-prompt
+/packages/vector-brain
+/apps/dashboard-next
+/infra/docker-compose.yml
+/docs/architecture.md     ← put this Context section here
+
+2. **Tooling & configs**
+   • `pnpm-workspace.yaml`  
+   • Root `tsconfig.json` with project references  
+   • ESLint + Prettier (Airbnb base)  
+   • Devcontainer / Replit Nix so `pnpm install` works OOTB
+
+3. **Database**
+   • `docker-compose.yml` spins Postgres 16 with **pgvector**  
+   • Prisma schema in `/infra/schema.prisma` with starter model:
+
+```prisma
+model Event {
+  id        String   @id @default(uuid())
+  type      String
+  payload   Json
+  createdAt DateTime @default(now())
+}
+
+	4.	Scripts
+• Root dev script that
+	1.	Boots Docker DB if not running
+	2.	Runs pnpm install on first run
+	3.	Starts events-gateway on port 4000
+	5.	Minimal code
+• events-gateway exposes GET /health → { "status": "ok" }
+
+⸻
+
+✅ Acceptance criteria
+	•	Running pnpm install && pnpm dev from repo root:
+• launches Postgres container
+• migrates schema
+• starts gateway → http://localhost:4000/health returns ok JSON
+	•	pnpm lint passes.
+	•	docs/architecture.md contains the Context section above.
+
+Generate the scaffold, install dependencies, and commit a single checkpoint.
+Do not implement other services yet—we’ll build them in later phases.
+
