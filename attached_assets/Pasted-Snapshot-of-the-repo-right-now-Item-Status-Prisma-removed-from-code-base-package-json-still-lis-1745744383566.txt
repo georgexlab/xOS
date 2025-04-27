@@ -1,0 +1,86 @@
+Snapshot of the repo right now
+
+Item	Status
+Prisma removed from code base	❌ — package.json still lists prisma and @prisma/client; Prisma CLI is still in node_modules.
+Prisma schema file deleted	✅ infra/schema.prisma is gone.
+Drizzle migrations committed	✅ /drizzle/0000_supreme_sleeper.sql exists.
+Root pnpm dev alias	❌ not in root package.json.
+Docker logic stripped from scripts/dev.js	✅ no Docker checks remain.
+README quick-start	❌ file doesn’t exist yet.
+docs/architecture.md updated	⚠️ present, but still says “Tech stack: … Prisma …” and has no diagram.
+Lint passes	not test-run yet.
+
+So you knocked out about half of the clean-up list—nice!
+Two blockers remain before we tag phase-0-ok and move to the quote-wizard sprint.
+
+⸻
+
+1. Finish the clean-up (5-10 min)
+
+a) Purge Prisma completely
+
+pnpm remove prisma @prisma/client
+
+Then delete any lingering Prisma references in package.json scripts or elsewhere (search for prisma).
+
+b) Add the dev & lint aliases
+
+package.json (root)
+
+"scripts": {
+  "dev": "node scripts/dev.js",
+  "lint": "eslint . --ext .ts"
+}
+
+c) README
+
+Create README.md at root:
+
+## xOS – Phase 0
+
+```bash
+pnpm install
+pnpm dev             # Boots events-gateway on port 5000 (Replit PORT env when hosted)
+curl $PORT/health    # → { "status": "ok" }
+
+### d) docs/architecture.md touch-up
+
+* Replace “Prisma” with **Drizzle**.  
+* Add this quick directory sketch:
+
+/services
+├─ events-gateway         # API layer
+├─ quote-wizard           # (next phase)
+└─ payment-reconcile      # (later)
+/packages
+├─ shared-prompt
+└─ vector-brain
+/apps
+└─ dashboard-next
+/infra           # docker-compose, drizzle config
+
+---
+
+## 2. Sanity check
+
+```bash
+pnpm install
+pnpm dev                 # server runs, no Prisma warnings
+curl localhost:5000/health   # { "status": "ok" }
+drizzle-kit status           # 0 pending migrations
+pnpm lint                    # exit 0
+
+When those four commands succeed, commit & push, then:
+
+git tag phase-0-ok
+git push --tags
+
+
+
+⸻
+
+3. Green-light for Phase 1
+
+Once the tag is live, paste the Phase 1 prompt I gave earlier into the Replit Agent to build /services/quote-wizard (Zoho draft generator).
+
+If you hit any hiccups finishing the clean-up, drop the error or link and I’ll troubleshoot before we advance. 🚀
